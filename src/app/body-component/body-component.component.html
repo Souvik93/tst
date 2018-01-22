@@ -1,0 +1,213 @@
+<div class="container-fluid">
+   <div class="row">
+      <div class="col-md-12">
+         <h4>A prescriptive machine learning model to calculate the driving risk level at real-time based on demographic, geographic and driving conditions. The model is trained on NHTSA Data base of accidents. </h4>
+         <img src="/assets/images/img.png" class="img-bg" >
+      </div>
+      <div class="col-md-12 ">
+         <div class="col-md-12 div-border">
+            <h4> Driver Details </h4>
+         </div>
+         <form>
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="col-md-3">
+                     <div class="form-group">
+                        <label for="sex" class="subheading">Choose Your Gender:</label>
+                        <br>
+                        <input type="radio" [value]="1" name="gender" [(ngModel)]="sex" > Male
+                        <input type="radio" [value]="0" name="gender" [(ngModel)]="sex" > Female
+                     </div>
+                  </div>
+                  <div class="col-md-3">
+                     <div class="form-group">
+                        <label for="dob" class="subheading">Enter Your Age:</label>
+                        <input type="number" class="form-control form-control-custom" id="dob" [(ngModel)]="age" name="dobName">
+                     </div>
+                  </div>
+                  <div class="col-md-3">
+                  </div>
+                  <div class="col-md-3">
+                  </div>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-md-12 ">
+                  <div class="col-md-12 div-border">
+                     <h4> Vehicle Details </h4>
+                  </div>
+               </div>
+               <div class="col-md-12">
+                  <div class="col-md-3">
+                     <label for="vtype" class="subheading">Choose Your Vehicle Type:</label>
+                     <br>
+                     <select [(ngModel)]="vehicleType" name="vehicle">
+                     <option [value]="0">2D Sedan</option>
+                     <option [value]="1">4D Sedan</option>
+                     <option [value]="2">Comp pickup</option>
+                     <option [value]="3">Comp SUV</option>
+                     <option [value]="4">Large Pickup</option>
+                     <option [value]="5">Motorcycle</option>
+                     <option [value]="6">Minivan</option>
+                     </select>
+                  </div>
+                  <div class="col-md-3">
+                     <label for="vechage" class="subheading">Provide Your Vehicle Age:</label>
+                     <!-- <input type="date" class="form-control form-control-custom" id="vechage" [(ngModel)]="vechage" name="dobName" (ngModelChange)="calculateVAge($event)"> -->
+                     <input type="number" [(ngModel)]="vechage" name="vage" id="vechage" class="extra-margin-bottom form-control form-control-custom ">
+                  </div>
+                  <div class="col-md-6">
+                  </div>
+               </div>
+            </div>
+         </form>
+      </div>
+      <div class="col-md-12">
+         <div class="col-md-12 div-border">
+            <h4> Driving Conditions </h4>
+         </div>
+         <div class="col-md-3">
+            <!-- <agm-map [latitude]="lat" [longitude]="lng">
+               <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+               </agm-map> -->
+            <!-- <agm-map [latitude]="lat" [longitude]="lng">
+               <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+               </agm-map> -->
+            <!-- <button class="btn btn-info" (click)="getGeoLocation()">Get Your Location</button> -->
+         </div>
+         <div class="col-md-9">
+         </div>
+      </div>
+      <div class="col-md-12">
+        <!-- Angular Map Directive HTML Starts Here -->
+         <div class="col-md-3">
+            <label class="subheading">
+            Choose Your Location: <i class="fa fa-map-marker" aria-hidden="true" title="Detect Your Current Location" (click)="getGeoLocation()"></i>
+            </label>
+            <agm-map
+            [latitude]="lat"
+            [longitude]="lng"
+            [zoom]="zoom"
+            [disableDefaultUI]="false"
+            [zoomControl]="true"
+            (mapClick)="mapClicked($event)">
+            <agm-marker
+            *ngFor="let m of markers; let i = index"
+            (markerClick)="clickedMarker(m.label, i)"
+            [latitude]="m.lat"
+            [longitude]="m.lng"
+            [label]="m.label"
+            [markerDraggable]="m.draggable"
+            (dragEnd)="markerDragEnd(m, $event)">
+            <agm-info-window>
+               <strong>InfoWindow content</strong>
+            </agm-info-window>
+            </agm-marker>
+            <agm-circle [latitude]="lat" [longitude]="lng"
+            [radius]="50"
+            [fillColor]="'red'"
+            [circleDraggable]="true"
+            [editable]="true">
+            </agm-circle>
+            </agm-map>
+
+            <!-- Angular Map Directive HTML Ends Here -->
+
+         </div>
+         <div class="col-md-3"  *ngIf="loacationDeatails!=undefined">
+            <label class="subheading">Location:</label>
+            <br>
+            <label *ngIf="loacationDeatails!=undefined"> {{loacationDeatails.Location.Address.Label}} </label>
+            <br>
+            <label class="subheading">Weather Status:</label>
+            <br>
+            <span *ngIf="wDetails!=undefined">
+               <!-- <span>City Name- {{wDetails.name}}</span> -->
+               <span>Condition - {{wDetails.weather[0].main}}</span>
+               <!-- <span>({{wDetails.weather[0].description}})</span> -->
+               <br>
+               <span>Humidity - {{wDetails.main.humidity}} %</span>
+               <br>
+               <span>Temperature - {{wDetails.main.temp}} Kelvin %</span>
+            </span>
+         </div>
+         <div class="col-md-3" *ngIf="loacationDeatails!=undefined" >
+            <label class="subheading">
+            Speed Limit:
+            </label>
+            <br>
+            <label *ngIf="loacationDeatails!=undefined"> {{speedRange}} MPH </label>
+            <br>
+            <br>
+            <div class="col-md-12 no-padding-left">
+               <label class="subheading"> Vehicle Speed (mph):</label>
+            </div>
+            <div class="col-md-1 extra-margin hidden-xs ">
+               <label>0</label>
+            </div>
+            <div class="col-md-8 extra-margin col-xs-12">
+               <input name="ram" type="range" min="0" [max]="max" [(ngModel)]="mymodel" value="0">
+            </div>
+            <div class="col-md-2 extra-margin hidden-xs">
+               <label>{{max}}</label>
+            </div>
+            <!-- </span> <img src="/assets/images/clear.png" width="20" height="20"> -->
+         </div>
+         <div class="col-md-3"  *ngIf="loacationDeatails!=undefined">
+            <div class="col-md-2 col-xs-3">
+            </div>
+
+            <!-- Ng Gauge Directive HTML Starts Here -->
+            <div class="col-md-8 col-xs-6">
+               <ng-gauge [max]="max" [input]="mymodel" [unit]="'mph'" [showDigital]="true" [light]="90" [sectors]="sectors">
+               </ng-gauge>
+            </div>
+            <!-- Ng Gauge Directive HTML Ends Here -->
+
+            <div class="col-md-2 col-xs-3">
+            </div>
+         </div>
+      </div>
+      <div class="col-md-12 col-xs-12">
+         <button class="btn btn-info pull-right hidden-xs" (click)="getPrediction()">Get Risk Level</button>
+         <button class="btn btn-info btn-block extra-margin extra-margin-bottom visible-xs" (click)="getPrediction()">Get Risk Level</button>
+      </div>
+      <div class="col-md-12 ">
+         <div class="col-md-12 hidden-xs div-border">
+            <h4> Risk Outcome </h4>
+         </div>
+         <div class="col-xs-12 no-padding-left visible-xs">
+            <h4 class="div-border extra-padding"> Risk Outcome </h4>
+         </div>
+         <div class="col-md-12">
+            <div class="col-md-3 col-xs-4">
+               <!-- <label> Safe </label> -->
+               <label *ngIf="predictionResult!=undefined" style="font-size:18px; padding-top:10px;">  {{predictionResult.INCPROB}} %</label>
+            </div>
+            <!-- <div class="col-md-3">
+               <input *ngIf="INCPROB=='red'" class="tl" type="radio" name="traffic-light-color" id="color1" [(ngModel)]="INCPROB" value="red" [checked]="INCPROB <0.33" />
+
+               </div>
+
+               <div class="col-md-3">
+
+               <input *ngIf="INCPROB=='yellow'" class="tl" type="radio" name="traffic-light-color" id="color2" [(ngModel)]="INCPROB" value="yellow" [checked]="INCPROB >=0.33 && predictionResult1.INCPROB <0.66"/>
+
+               </div>
+
+               <div class="col-md-3">
+
+               <input *ngIf="INCPROB=='green'" class="tl" type="radio" name="traffic-light-color" id="color3" [(ngModel)]="INCPROB" value="green" [checked]="INCPROB >=0.66" />
+
+               </div> -->
+            <div class="col-md-9 col-xs-8">
+               <div id="traffic-light">
+                  <input class="tl  disabled" type="radio" name="traffic-light-color" id="color1" [(ngModel)]="INCPROB" value="red" [checked]="INCPROB =='red'" />
+                  <input  class="tl  disabled" type="radio" name="traffic-light-color" id="color2" [(ngModel)]="INCPROB" value="yellow" [checked]="INCPROB =='yellow'"/>
+                  <input  class="tl  disabled" type="radio" name="traffic-light-color" id="color3" [(ngModel)]="INCPROB" value="green" [checked]="INCPROB =='green'" />
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
