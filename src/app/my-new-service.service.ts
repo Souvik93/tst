@@ -38,14 +38,9 @@ public getWeatherDetails(lat,lon)
  }
 
  public getPrediction(bodyjson){
-   return this.http
-     .post('http://LIN66003802:5100/predict/safari_api', bodyjson)
-       .map(data => {
-             var result=data;
-             console.log(result);
-       }, error => {
-           console.log(error.json());
-       });
+   return this.http.post('http://localhost:5100/predict/safari_api',bodyjson)
+     .map(res => res.json());
+
 }
 
 }

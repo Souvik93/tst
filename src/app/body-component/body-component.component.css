@@ -178,32 +178,35 @@
  input#color1 {
      background-color: #d18d8d;
 }
- input#color1:hover {
+ /* input#color1:hover {
      animation: blink1 1.1s step-end infinite;
-}
+} */
  input#color1:checked {
      background-color: #ff0000;
      box-shadow: 0 0 6em #ff3333;
+     animation: blink1 1s step-end 2;
 }
  input#color2 {
      background-color: #f1f6b6;
 }
- input#color2:hover {
+ /* input#color2:hover {
      animation: blink2 1s step-end infinite;
-}
+} */
  input#color2:checked {
      background-color: #ffff00;
      box-shadow: 0 0 6em #ffff33;
+        animation: blink2 1s step-end 2;
 }
  input#color3 {
      background-color: #c0f4c0;
 }
- input#color3:hover {
+ /* input#color3:hover {
      animation: blink3 1s step-end infinite;
-}
+} */
  input#color3:checked {
      background-color: #00ff00;
      box-shadow: 0 0 6em #33ff33;
+     animation: blink3 1s step-end 2;
 }
  @keyframes blink1 {
      0% {

@@ -49,17 +49,25 @@ public sectors = [
 //private speedMap:Map<string,string> = new Map([["SC1","80"],["SC2","65-80"],["SC3","55-64"],["SC4","41-54"],["SC5","31-40"],["SC5","31-40"],["SC6","21-30"],["SC7","6-20"],["SC8","<6"]]);
 
 private speedMap:Map<string,number> = new Map([["SC1",80],["SC2",73],["SC3",60],["SC4",48],["SC5",36],["SC6",26],["SC7",13],["SC8",3]]);
-private weatherConditionMap:Map<string,number> = new Map([["Clear",0],["Cloudy",1],["Fog",2],["Rain",3],["Snow",4],["Freeze",4],["Strong Wind",5]]);
+private weatherConditionMap:Map<string,number> = new Map([["Clear",0],["Cloudy",1],["Fog",2],["Rain",3],["Snow",4],["Freeze",4],["Strong Wind",5],["Thunderstorm",5]]);
   constructor(public myNewServiceService: MyNewServiceService) {
 
  }
 
     ngOnInit() {
-
       this.myNewServiceService.getStateDetails().subscribe(result=>{
       this.stateDettails=result;
     });
     this.fetchDetails(this.lat,this.lng);
+
+    if(this.loacationDeatails==undefined)
+    {
+      alert("Location Details Unavailable");
+    }
+    if(this.wDetails==undefined)
+    {
+      alert("Weather Details Unavailable");
+    }
   }
   calculateVAge()
   {
@@ -129,9 +137,10 @@ fetchDetails(a,b)
     this.speedRange=this.speedMap.get(this.loacationDeatails.Location.LinkInfo.SpeedCategory);
   });
 }
-
+pred:any=0.45;
 public getPrediction()
 {
+
   this.jsonBody.GENDER=this.sex;
   this.jsonBody.AGE=this.age;
   this.jsonBody.PASSTYPE=1; //Predefined
@@ -140,9 +149,11 @@ public getPrediction()
   {
     console.log(this.wDetails.weather[0].main);
     this.jsonBody.WEATHER=this.weatherConditionMap.get(this.wDetails.weather[0].main);
+    if(this.jsonBody.WEATHER==undefined)
+    this.jsonBody.WEATHER=1;
   }
   else
-  this.jsonBody.WEATHER=2;
+  this.jsonBody.WEATHER=1;
   this.jsonBody.VEHAGE=this.vechage;
 
   this.jsonBody.VEHTYPE=Number(this.vehicleType);
@@ -162,30 +173,57 @@ public getPrediction()
       this.jsonBody.STATE=element.ID;
     });
   console.log(this.jsonBody);
-  this.predictionResult=this.myNewServiceService.getPrediction(this.jsonBody);
+  //this.predictionResult=this.myNewServiceService.getPrediction(this.jsonBody);
+//console.log(this.myNewServiceService.getPrediction(this.jsonBody));
+
+
+this.myNewServiceService.getPrediction(this.jsonBody).subscribe(result=>{
+this.predictionResult=result;
+console.log(this.predictionResult);
+});
+
+if(Math.round(this.pred * 100)>0 && Math.round(this.pred * 100)<30)
+  {
+    console.log("Green Block");
+    this.INCPROB="green";
+
+  }
+  if(Math.round(this.pred * 100)>=31 && Math.round(this.pred * 100) <=66)
+    {
+      console.log("Yellow Block");
+      this.INCPROB="yellow";
+
+    }
+    if(Math.round(this.pred * 100)>67)
+      {
+        console.log("Red Block");
+        this.INCPROB="red";
+      }
+
+
 
 if(this.predictionResult.STATUS==100)
 {
 
-if(this.predictionResult.INCPROB>0 && this.predictionResult.INCPROB <0.30)
+ if(Math.round(this.predictionResult.INCPROB)>0 && Math.round(this.predictionResult.INCPROB) <30)
   {
-    this.INCPROB="green";
+   this.INCPROB="green";
 
   }
-  if(this.predictionResult.INCPROB>=0.31 && this.predictionResult.INCPROB <=0.66)
+  if(Math.round(this.predictionResult.INCPROB)>=31 && Math.round(this.predictionResult.INCPROB) <=66)
     {
-      this.INCPROB="yellow";
+     this.INCPROB="yellow";
 
-    }
-    if(this.predictionResult.INCPROB>0.67)
-      {
-        this.INCPROB="red";
-      }
-    }
-    else
+  }
+ if(Math.round(this.predictionResult.INCPROB)>67)
     {
-      alert("Some Error Occured .... Try Again Later...");
-      this.predictionResult.INCPROB="Failed To Predict";
+      this.INCPROB="red";
+     }
+   }
+  else
+     {
+   alert("Some Error Occured .... Try Again Later...");
+     this.predictionResult.INCPROB="Failed To Predict";
     }
   }
 
