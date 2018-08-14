@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MyNewServiceService } from './../my-new-service.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-body-component',
@@ -14,6 +15,9 @@ public vage:any;
 public vechage:string;
 public vehicleType:number;
 public predictionResult:any;
+busy: Subscription;
+public loading:any;
+public number: number = 1000;
 
 public lat1:number;
 public lng1:number;
@@ -27,8 +31,9 @@ public speedRange:any="";
 public mymodel:number=60;
 public max = 120;
 public stateDettails:any;
-public sex:any;
+public sex:any=1;
 public INCPROB:any="none";
+public  loadingMap:any;
 public sectors = [
 {
   from:0,
@@ -55,19 +60,17 @@ private weatherConditionMap:Map<string,number> = new Map([["Clear",0],["Cloudy",
  }
 
     ngOnInit() {
+      this.loadingMap = true;
       this.myNewServiceService.getStateDetails().subscribe(result=>{
+        this.loadingMap = false;
       this.stateDettails=result;
-    });
+    },
+    err => {
+                    this.loading = false;
+                    //...
+                })
+    ;
     this.fetchDetails(this.lat,this.lng);
-
-    if(this.loacationDeatails==undefined)
-    {
-      alert("Location Details Unavailable");
-    }
-    if(this.wDetails==undefined)
-    {
-      alert("Weather Details Unavailable");
-    }
   }
   calculateVAge()
   {
@@ -81,7 +84,11 @@ private weatherConditionMap:Map<string,number> = new Map([["Clear",0],["Cloudy",
     console.log(position);
     this.lat=position.coords.latitude;
     this.lng=position.coords.longitude;
+    //markerDragEnd(Marker: m, $event);
     // in your case
+    this.markers[0].lat=this.lat;
+    this.markers[0].lng=this.lng;
+
     this.fetchDetails(position.coords.latitude,position.coords.longitude);
 });
   }
@@ -140,6 +147,12 @@ fetchDetails(a,b)
 pred:any=0.45;
 public getPrediction()
 {
+  if(this.age==undefined || this.vehicleType==undefined ||  this.vechage==undefined)
+  {
+    alert("Please Provide All Driver Or Vehicle Details");
+  }
+  else
+  {
 
   this.jsonBody.GENDER=this.sex;
   this.jsonBody.AGE=this.age;
@@ -152,7 +165,7 @@ public getPrediction()
     if(this.jsonBody.WEATHER==undefined)
     this.jsonBody.WEATHER=1;
   }
-  else
+
   this.jsonBody.WEATHER=1;
   this.jsonBody.VEHAGE=this.vechage;
 
@@ -173,49 +186,27 @@ public getPrediction()
       this.jsonBody.STATE=element.ID;
     });
   console.log(this.jsonBody);
-  //this.predictionResult=this.myNewServiceService.getPrediction(this.jsonBody);
-//console.log(this.myNewServiceService.getPrediction(this.jsonBody));
 
+this.loading = true;
 
 this.myNewServiceService.getPrediction(this.jsonBody).subscribe(result=>{
+this.loading = false;
 this.predictionResult=result;
 console.log(this.predictionResult);
-});
-
-if(Math.round(this.pred * 100)>0 && Math.round(this.pred * 100)<30)
-  {
-    console.log("Green Block");
-    this.INCPROB="green";
-
-  }
-  if(Math.round(this.pred * 100)>=31 && Math.round(this.pred * 100) <=66)
-    {
-      console.log("Yellow Block");
-      this.INCPROB="yellow";
-
-    }
-    if(Math.round(this.pred * 100)>67)
-      {
-        console.log("Red Block");
-        this.INCPROB="red";
-      }
-
-
-
 if(this.predictionResult.STATUS==100)
 {
 
- if(Math.round(this.predictionResult.INCPROB)>0 && Math.round(this.predictionResult.INCPROB) <30)
+ if(Math.round(this.predictionResult.INCPROB * 100)>0 && Math.round(this.predictionResult.INCPROB * 100) <30)
   {
    this.INCPROB="green";
 
   }
-  if(Math.round(this.predictionResult.INCPROB)>=31 && Math.round(this.predictionResult.INCPROB) <=66)
+  if(Math.round(this.predictionResult.INCPROB * 100)>=31 && Math.round(this.predictionResult.INCPROB * 100) <=66)
     {
      this.INCPROB="yellow";
 
   }
- if(Math.round(this.predictionResult.INCPROB)>67)
+ if(Math.round(this.predictionResult.INCPROB * 100)>67)
     {
       this.INCPROB="red";
      }
@@ -225,7 +216,17 @@ if(this.predictionResult.STATUS==100)
    alert("Some Error Occured .... Try Again Later...");
      this.predictionResult.INCPROB="Failed To Predict";
     }
-  }
+
+
+}
+, err => {
+                this.loading = false;
+                //...
+            });
+
+
+}
+}
 
   zoom: number = 14;
   // initial center position for the map
@@ -257,9 +258,11 @@ if(this.predictionResult.STATUS==100)
 
   markers: marker[] = [
 	  {
-		  lat: 41.840794,
-		  lng: -87.952377,
-		  label: 'A',
+		  // lat: 41.840794,
+		  // lng: -87.952377,
+      lat:this.lat,
+      lng:this.lng,
+		  label: 'Car',
 		  draggable: true
 	  }
   ]

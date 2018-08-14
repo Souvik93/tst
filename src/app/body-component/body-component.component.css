@@ -1,9 +1,22 @@
 .no-padding-left {
      padding-left: 0px;
 }
+.no-padding {
+     padding: 0px;
+}
+
+.no-padding-right {
+     padding-right: 0px;
+}
  .btn , .active , .focus {
      outline: none;
 }
+
+.label-speed
+{
+  padding-top: 5px;
+}
+
  .form-control-custom {
      border: 0;
      height:25px;

@@ -10,6 +10,11 @@ import { BodyComponentComponent } from './body-component/body-component.componen
 import { MyNewServiceService } from './my-new-service.service';
 import { GaugeModule } from 'ng2-gauge';
 import { AgmCoreModule } from '@agm/core';
+import {BusyModule} from 'angular2-busy';
+import { LoadingModule ,ANIMATION_TYPES } from 'ngx-loading';
+import { Ng2OdometerModule } from 'ng2-odometer';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,6 +27,9 @@ import { AgmCoreModule } from '@agm/core';
     FormsModule,
     HttpModule,
     GaugeModule,
+    BusyModule,
+    LoadingModule,
+    Ng2OdometerModule.forRoot(),
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyDZ5rIF_as0p3eJW08nKkQE2c0EFdmpG1w'
     })

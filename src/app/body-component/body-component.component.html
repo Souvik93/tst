@@ -90,7 +90,7 @@
             [zoom]="zoom"
             [disableDefaultUI]="false"
             [zoomControl]="true"
-            (mapClick)="mapClicked($event)">
+            >
             <agm-marker
             *ngFor="let m of markers; let i = index"
             (markerClick)="clickedMarker(m.label, i)"
@@ -103,13 +103,15 @@
                <strong>InfoWindow content</strong>
             </agm-info-window>
             </agm-marker>
-            <agm-circle [latitude]="lat" [longitude]="lng"
+            <!-- <agm-circle [latitude]="lat" [longitude]="lng"
             [radius]="50"
             [fillColor]="'red'"
             [circleDraggable]="true"
             [editable]="true">
-            </agm-circle>
+            </agm-circle> -->
             </agm-map>
+
+            <ngx-loading [show]="loadingMap" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
 
             <!-- Angular Map Directive HTML Ends Here -->
 
@@ -119,6 +121,7 @@
             <br>
             <label *ngIf="loacationDeatails!=undefined"> {{loacationDeatails.Location.Address.Label}} </label>
             <br>
+            <br>
             <label class="subheading">Weather Status:</label>
             <br>
             <span *ngIf="wDetails!=undefined">
@@ -126,51 +129,56 @@
                <span>Condition - {{wDetails.weather[0].main}}</span>
                <!-- <span>({{wDetails.weather[0].description}})</span> -->
                <br>
-               <span>Humidity - {{wDetails.main.humidity}} %</span>
+               <!-- <span>Humidity - {{wDetails.main.humidity}} %</span>
                <br>
-               <span>Temperature - {{wDetails.main.temp}} Kelvin</span>
+               <span>Temperature - {{wDetails.main.temp}} Kelvin</span> -->
             </span>
          </div>
-         <div class="col-md-3" *ngIf="loacationDeatails!=undefined" >
-            <label class="subheading">
-            Speed Limit:
-            </label>
-            <br>
-            <label *ngIf="loacationDeatails!=undefined"> {{speedRange}} MPH </label>
-            <br>
-            <br>
-            <div class="col-md-12 no-padding-left">
-               <label class="subheading"> Vehicle Speed (mph):</label>
-            </div>
-            <div class="col-md-1 extra-margin hidden-xs ">
-               <label>0</label>
-            </div>
-            <div class="col-md-8 extra-margin col-xs-12">
-               <input name="ram" type="range" min="0" [max]="max" [(ngModel)]="mymodel" value="0">
-            </div>
-            <div class="col-md-2 extra-margin hidden-xs">
-               <label>{{max}}</label>
-            </div>
-            <!-- </span> <img src="/assets/images/clear.png" width="20" height="20"> -->
-         </div>
-         <div class="col-md-3"  *ngIf="loacationDeatails!=undefined">
-            <div class="col-md-2 col-xs-3">
-            </div>
+         <div class="col-md-6" *ngIf="loacationDeatails!=undefined" >
+           <div class="col-md-6 no-padding">
 
-            <!-- Ng Gauge Directive HTML Starts Here -->
-            <div class="col-md-8 col-xs-6">
-               <ng-gauge [max]="max" [input]="mymodel" [unit]="'mph'" [showDigital]="true" [light]="90" [sectors]="sectors">
-               </ng-gauge>
-            </div>
-            <!-- Ng Gauge Directive HTML Ends Here -->
+             <div class="col-md-12 no-padding">
+                <label class="subheading"> Vehicle Speed (mph):</label>
+             </div>
 
-            <div class="col-md-2 col-xs-3">
-            </div>
+             <div class="col-md-1 hidden-xs hidden-sm no-padding">
+                 <label class="label-speed">0</label>
+             </div>
+
+             <div class="col-md-9 col-xs-12 no-padding-left">
+              <input name="ram" type="range" min="0" [max]="max" [(ngModel)]="mymodel" value="0">
+             </div>
+             <div class="col-md-2 hidden-xs hidden-sm no-padding">
+                 <label class="label-speed">{{max}}</label>
+             </div>
+            <br>
+             <div class="col-md-12 hidden-xs no-padding">
+               <br>
+               <ng2-odometer style="font-size: 25px;" [number]="mymodel" [value]="60" [config]="{theme: 'car'}"></ng2-odometer>
+             </div>
+             <div class="col-md-12 visible-xs visible-sm text-center">
+               <br>
+               <br>
+               <ng2-odometer style="font-size: 25px;" [number]="mymodel" [value]="60" [config]="{theme: 'car'}"></ng2-odometer>
+             </div>
+           </div>
+
+           <div class="col-md-6 no-padding">
+             <div class="col-md-12 no-padding">
+               <label class="subheading">
+               Speed Limit:
+               </label>
+               <br>
+               <label *ngIf="loacationDeatails!=undefined"> {{speedRange}} MPH </label>
+             </div>
+           </div>
+
          </div>
+
       </div>
       <div class="col-md-12 col-xs-12">
-         <button class="btn btn-info pull-right hidden-xs" (click)="getPrediction()">Get Risk Level</button>
-         <button class="btn btn-info btn-block extra-margin extra-margin-bottom visible-xs" (click)="getPrediction()">Get Risk Level</button>
+         <button class="btn btn-info pull-right hidden-xs"  [disabled]="age==undefined || vehicleType==undefined ||  vechage==undefined" (click)="getPrediction()">Get Risk Level</button>
+         <button class="btn btn-info btn-block extra-margin extra-margin-bottom visible-xs" [disabled]="age==undefined || vehicleType==undefined ||  vechage==undefined" (click)="getPrediction()">Get Risk Level</button>
       </div>
       <div class="col-md-12 ">
          <div class="col-md-12 hidden-xs div-border">
@@ -180,9 +188,10 @@
             <h4 class="div-border extra-padding"> Risk Outcome </h4>
          </div>
          <div class="col-md-12">
+           <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
             <div class="col-md-3 col-xs-4">
                <!-- <label> Safe </label> -->
-               <label *ngIf="predictionResult!=undefined" style="font-size:18px; padding-top:10px;">  {{predictionResult.INCPROB}} %</label>
+                <label *ngIf="predictionResult!=undefined" style="font-size:18px; padding-top:30px;">  {{predictionResult.INCPROB}} </label>
             </div>
             <!-- <div class="col-md-3">
                <input *ngIf="INCPROB=='red'" class="tl" type="radio" name="traffic-light-color" id="color1" [(ngModel)]="INCPROB" value="red" [checked]="INCPROB <0.33" />
